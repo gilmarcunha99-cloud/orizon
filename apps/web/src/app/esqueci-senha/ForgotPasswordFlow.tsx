@@ -54,6 +54,29 @@ export function ForgotPasswordFlow({ modo = "recuperar", emailInicial = "", toke
     };
   }, [convite, tokenHash]);
 
+  // Link padrão do Supabase (fluxo com #access_token): abre a sessão e vai para a criação da senha.
+  useEffect(() => {
+    if (!convite) return;
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+    if (params.get("error_code")) {
+      history.replaceState(null, "", window.location.pathname);
+      setErro("Este link expirou ou já foi usado. Digite o código do e-mail ou peça um novo convite.");
+      return;
+    }
+    if (!access_token || !refresh_token) return;
+    history.replaceState(null, "", window.location.pathname);
+    setEnviando(true);
+    createClient()
+      .auth.setSession({ access_token, refresh_token })
+      .then(({ error }) => {
+        setEnviando(false);
+        if (error) setErro("Este link expirou ou já foi usado. Digite o código do e-mail ou peça um novo convite.");
+        else setEtapa("senha");
+      });
+  }, [convite]);
+
   useEffect(() => {
     if (espera <= 0) return;
     const t = setTimeout(() => setEspera((s) => s - 1), 1000);
