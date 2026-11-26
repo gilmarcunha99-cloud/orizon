@@ -1,5 +1,5 @@
 /* Orizon Pass — estilos base do site (login aprovado em 16/11 e 20/11/2026).
-   Cores e fontes do BrandBook Orizon Sports. Tema claro único (decisão de design). */
+   Cores e fontes do BrandBook Orizon Sports. Fontes servidas pelo próprio site (@fontsource). Tema claro único (decisão de design). */
 :root {
   --oz-blue: #003E49;
   --oz-blue-hover: #00323A;
@@ -14,8 +14,8 @@
   --oz-line: #C4CACA;
   --oz-danger: #C8372D;
   --oz-success: #1B7A4F;
-  --oz-font: var(--font-poppins), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --oz-font-section: var(--font-oswald), 'Arial Narrow', sans-serif;
+  --oz-font: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --oz-font-section: 'Oswald', 'Arial Narrow', sans-serif;
   color-scheme: light;
 }
 
