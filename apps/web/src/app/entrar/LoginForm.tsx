@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ArrowIcon, MailIcon } from "@/components/Icons";
 import { PasswordField } from "@/components/PasswordField";
 import { createClient } from "@/lib/supabase/client";
@@ -15,6 +15,13 @@ export function LoginForm() {
   const [erro, setErro] = useState<string | null>(null);
   const [campos, setCampos] = useState({ email: false, senha: false });
   const [enviando, setEnviando] = useState(false);
+
+  // Links de convite/recuperação no formato padrão do Supabase (#access_token=... ou #error=...)
+  // caem aqui pelo Site URL: encaminha para a criação de senha mantendo o fragmento.
+  useEffect(() => {
+    const h = window.location.hash;
+    if (/[#&](access_token|error_code)=/.test(h)) window.location.replace(`/criar-senha${h}`);
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
