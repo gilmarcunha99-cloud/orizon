@@ -1,0 +1,36 @@
+/* ORIZON SPORTS — design tokens (derivados do BrandBook). Fontes: Google Fonts Poppins + Oswald. */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Poppins:wght@300;400;700;800;900&display=swap');
+:root {
+  /* marca (oficiais) */
+  --oz-deep-horizon-blue: #003E49;
+  --oz-energy-pulse-orange: #E48519;
+  --oz-steel-gray: #6C7A7A;
+  --oz-cloud-mist: #E4E7E7;
+  --oz-cloud-mist-warm: #EDE7DB;
+  /* derivados */
+  --oz-blue-900: #00161A; --oz-blue-800: #001F24; --oz-blue-700: #00282F; --oz-blue-600: #00323A; --oz-blue-400: #33656D; --oz-blue-200: #99B2B6; --oz-blue-50: #EBF0F0;
+  --oz-orange-700: #945610; --oz-orange-600: #B66A14; --oz-orange-300: #EFB675; --oz-orange-100: #FAE7D1;
+  --oz-gray-600: #566262; --oz-gray-200: #C4CACA; --oz-gray-50: #F3F4F4;
+  --oz-success: #1B7A4F; --oz-warning: #946200; --oz-danger: #C8372D; --oz-info: #1F6FB2;
+  /* semânticos (tema claro) */
+  --oz-bg: var(--oz-gray-50); --oz-surface: #FFFFFF; --oz-surface-alt: var(--oz-cloud-mist-warm);
+  --oz-text: var(--oz-deep-horizon-blue); --oz-text-muted: var(--oz-gray-600);
+  --oz-primary: var(--oz-deep-horizon-blue); --oz-on-primary: #FFFFFF;
+  --oz-accent: var(--oz-energy-pulse-orange); --oz-on-accent: var(--oz-deep-horizon-blue);
+  --oz-accent-text: var(--oz-orange-700); /* laranja para TEXTO sobre fundo claro (contraste AA) */
+  --oz-border: var(--oz-gray-200); --oz-focus: var(--oz-energy-pulse-orange);
+  /* tipografia */
+  --oz-font-heading: 'Poppins', system-ui, sans-serif;
+  --oz-font-section: 'Oswald', 'Arial Narrow', sans-serif;
+  --oz-font-body: 'Poppins', system-ui, sans-serif;
+  /* forma */
+  --oz-radius-sm: 8px; --oz-radius-md: 12px; --oz-radius-lg: 20px; --oz-radius-pill: 999px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --oz-bg: var(--oz-blue-900); --oz-surface: var(--oz-blue-800); --oz-surface-alt: var(--oz-blue-600);
+    --oz-text: #FFFFFF; --oz-text-muted: var(--oz-gray-200);
+    --oz-primary: var(--oz-energy-pulse-orange); --oz-on-primary: var(--oz-deep-horizon-blue);
+    --oz-accent-text: var(--oz-orange-300); --oz-border: var(--oz-blue-400); --oz-focus: var(--oz-orange-300);
+  }
+}
