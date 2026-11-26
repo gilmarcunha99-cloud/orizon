@@ -1,35 +1,50 @@
 # Orizon
 
-Plataforma Orizon Sports para gestão de eventos esportivos (corridas de rua e beach tennis). App de trabalho: **Orizon Pass**.
+Plataforma Orizon Sports para gestão de eventos esportivos (corridas de rua e beach tênis). App: **Orizon Pass**.
 
-## Estrutura atual
+## Estrutura
 
 ```
-web/                    site estático publicado no Vercel
-  index.html            tela Entrar (e-mail + senha)
-  primeiro-acesso.html  primeiro acesso: e-mail → código de 6 dígitos → criar senha (perfil Público)
-  404.html
-  assets/               estilos, script, logo e favicon da marca
-vercel.json             configuração do deploy (pasta publicada, URLs limpas, cabeçalhos de segurança)
+apps/
+  web/        Next.js: login, painel administrativo e portal público (Vercel)
+  mobile/     Flutter: app Orizon Pass (Android e iOS)
+packages/
+  brand/      cores, fontes e logos da marca (fonte única)
+supabase/
+  migrations/ alterações do banco, numeradas, aplicadas em homologação e depois em produção
+  templates/  e-mails de login (código de 6 dígitos e link)
+  seed.sql    dados de teste do ambiente local
+docs/         passo a passo de ambientes e decisões
+.github/      verificações automáticas
 ```
 
-As telas seguem o protótipo de login aprovado em 16/11/2026. **É um protótipo visual:** nenhum dado é enviado a servidor e não há autenticação real. O backend (envio do código por e-mail, criação de conta, login) entra numa fase seguinte.
+## Ambientes
+
+| Ambiente | Branch | Banco (Supabase) | Site | App |
+| --- | --- | --- | --- | --- |
+| Homologação | `homolog` | `orizon-homolog` | deploy da branch `homolog` na Vercel | Orizon Pass HML (`br.com.orizon.pass.hml`) |
+| Produção | `main` | `orizon-prod` (criado após a Fase 1) | deploy de produção na Vercel | Orizon Pass (`br.com.orizon.pass`) |
+
+Toda mudança entra por pull request em `homolog`. A `main` só recebe código na liberação da Fase 1.
+Passo a passo de configuração: [docs/homologacao.md](docs/homologacao.md).
 
 ## Rodar localmente
 
-Não há etapa de build. Basta servir a pasta `web/`, por exemplo:
+Site:
 
 ```bash
-npx serve web
+cd apps/web
+cp .env.example .env.local   # preencha com os dados do Supabase de homologação
+npm install
+npm run dev                  # http://localhost:3000
 ```
 
-## Deploy (Vercel)
+App (Android):
 
-O deploy é feito pela integração do Vercel com o GitHub:
+```bash
+cd apps/mobile
+cp env/homolog.example.json env/homolog.json   # preencha
+flutter run --flavor homolog --dart-define-from-file=env/homolog.json
+```
 
-- cada push na branch `main` publica em produção;
-- cada pull request ganha uma URL de pré-visualização própria.
-
-Configuração no Vercel (feita uma única vez): importar este repositório em **Add New › Project**, manter *Framework Preset* = **Other** e *Root Directory* = `./`. O `vercel.json` já define a pasta publicada (`web`).
-
-Quando o site público (Next.js) ou o painel administrativo (Flutter Web) existirem, a pasta `web/` será substituída pelo build correspondente e o `vercel.json` será ajustado.
+Banco local (opcional, precisa de Docker): `npx supabase start` na raiz aplica as migrações e o `seed.sql`.

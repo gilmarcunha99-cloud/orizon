@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-BR">
+<body style="margin:0;background:#E4E7E7;font-family:Poppins,Arial,sans-serif;color:#003E49">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border-radius:20px;padding:32px">
+        <tr><td style="font-size:22px;font-weight:700;padding-bottom:4px">Orizon <span style="color:#945610">Pass</span></td></tr>
+        <tr><td style="font-size:16px;line-height:1.5;padding:16px 0">Você foi convidado(a) para o Orizon Pass. Toque no botão para criar a sua senha. Se preferir, use o código abaixo na tela <strong>Criar senha</strong>.</td></tr>
+        <tr><td align="center" style="font-size:32px;letter-spacing:8px;font-weight:700;background:#F3F4F4;border-radius:12px;padding:16px">{{ .Token }}</td></tr>
+        <tr><td align="center" style="padding-top:24px"><a href="{{ .SiteURL }}/criar-senha?token_hash={{ .TokenHash }}&type=invite&email={{ .Email }}" style="display:inline-block;background:#003E49;color:#FFFFFF;text-decoration:none;font-weight:600;border-radius:14px;padding:14px 28px">Criar minha senha</a></td></tr>
+        <tr><td style="font-size:12px;line-height:1.5;color:#566262;padding-top:24px">O link e o código valem por 24 horas e só podem ser usados uma vez. Se você não pediu isto, ignore este e-mail.</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
