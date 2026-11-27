@@ -332,3 +332,21 @@ a:focus-visible, button:focus-visible, input[type=checkbox]:focus-visible {
 .pl-multi-box { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; width: 270px; padding: 8px 12px; border: 1px solid #DDE1E1; border-radius: 10px; background: #FFFFFF; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
 .pl-multi-box label { display: flex; gap: 8px; align-items: center; padding: 5px 2px; font-size: 13px; cursor: pointer; }
 .pl-multi-pe { display: flex; justify-content: space-between; gap: 10px; margin-top: 6px; padding-top: 8px; border-top: 1px solid #EEF0F0; font-size: 12px; }
+
+/* 2.6 Serviços, 2.7 Mercadorias, 2.8 Equipamentos e "Itens oferecidos" na ficha do fornecedor */
+.pl-cat { background: var(--oz-surface-alt); color: var(--oz-muted); font-weight: 500; }
+.pl-alug { background: var(--oz-orange-soft); color: var(--oz-orange-text); }
+.pl-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+.pl-grid2 .pl-inp, .pl-grid2 .pl-sel { width: 100%; }
+.pl-box { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 14px 16px; border: 1px solid #DDE1E1; border-radius: 10px; background: var(--oz-surface-alt); }
+.pl-box legend { padding: 0 4px; font-weight: 700; font-size: 14px; }
+.pl-lnk-b { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-weight: 600; }
+.pl-igrupo { display: flex; flex-direction: column; gap: 10px; }
+.pl-igrupo-cab { display: flex; align-items: baseline; gap: 10px; }
+.pl-itens { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.pl-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid #DDE1E1; border-radius: 10px; background: #FFFFFF; cursor: pointer; font-size: 14px; }
+.pl-item.on { border-color: var(--oz-orange); background: #FFF8F1; }
+.pl-item input { width: 18px; height: 18px; accent-color: var(--oz-blue); flex: none; }
+.pl-item-nome { flex: 1; font-weight: 600; }
+.pl-item:focus-within { outline: 2px solid var(--oz-orange); outline-offset: 1px; }
+@media (max-width: 900px) { .pl-itens, .pl-grid2 { grid-template-columns: 1fr; } }
