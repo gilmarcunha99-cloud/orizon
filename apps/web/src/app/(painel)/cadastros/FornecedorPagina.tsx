@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { FornecedorForm } from "./FornecedorForm";
 import { FORNECEDOR_VAZIO } from "./fornecedorRegras";
 import { carregarFornecedor } from "./dadosFornecedores";
+import { carregarItensFornecedor } from "./dadosCatalogo";
 
 const CODIGO = "cadastros.fornecedores";
 
@@ -15,9 +16,10 @@ export async function FornecedorPagina({ id, salvo }: { id: string; salvo?: stri
   if (!item) notFound();
 
   const supabase = await createClient();
-  const [{ data: pode }, fornecedor] = await Promise.all([
+  const [{ data: pode }, fornecedor, oferta] = await Promise.all([
     supabase.rpc("pode", { f: CODIGO, a: id === "novo" ? "criar" : "editar" }),
     id === "novo" ? Promise.resolve(null) : carregarFornecedor(id),
+    carregarItensFornecedor(id === "novo" ? null : id),
   ]);
   if (id !== "novo" && !fornecedor) notFound();
   const titulo = fornecedor ? fornecedor.dados.nome : "Novo fornecedor";
@@ -37,7 +39,10 @@ export async function FornecedorPagina({ id, salvo }: { id: string; salvo?: stri
         </div>
         {salvo === "1" && <p className="pl-ok">Fornecedor cadastrado.</p>}
         {pode ? (
-          <FornecedorForm key={id} inicial={fornecedor?.dados ?? FORNECEDOR_VAZIO} tambemCliente={fornecedor?.tambemCliente ?? false} />
+          <FornecedorForm key={id} inicial={fornecedor?.dados ?? FORNECEDOR_VAZIO} tambemCliente={fornecedor?.tambemCliente ?? false}
+            catalogo={oferta.itens}
+            marcadosInicial={oferta.marcados}
+          />
         ) : (
           <p className="pl-erro">Você não tem permissão para {id === "novo" ? "cadastrar" : "editar"} fornecedores.</p>
         )}

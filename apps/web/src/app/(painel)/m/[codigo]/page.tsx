@@ -11,6 +11,9 @@ import { ClientesTela } from "../../cadastros/ClientesTela";
 import { carregarClientes } from "../../cadastros/dadosClientes";
 import { FornecedoresTela } from "../../cadastros/FornecedoresTela";
 import { carregarFornecedores } from "../../cadastros/dadosFornecedores";
+import { CatalogoTela } from "../../cadastros/CatalogoTela";
+import { tipoDoCodigo } from "../../cadastros/catalogoRegras";
+import { carregarCatalogo } from "../../cadastros/dadosCatalogo";
 
 type Params = Promise<{ codigo: string }>;
 
@@ -83,6 +86,16 @@ async function Tela({ codigo, num, nome }: { codigo: string; num: string; nome: 
       supabase.rpc("pode", { f: codigo, a: "editar" }),
     ]);
     return <FornecedoresTela fornecedores={fornecedores} podeCriar={Boolean(criar.data)} podeEditar={Boolean(editar.data)} />;
+  }
+  const tipoItem = tipoDoCodigo(codigo);
+  if (tipoItem) {
+    const supabase = await createClient();
+    const [itens, criar, editar] = await Promise.all([
+      carregarCatalogo(tipoItem),
+      supabase.rpc("pode", { f: codigo, a: "criar" }),
+      supabase.rpc("pode", { f: codigo, a: "editar" }),
+    ]);
+    return <CatalogoTela tipo={tipoItem} itens={itens} podeCriar={Boolean(criar.data)} podeEditar={Boolean(editar.data)} />;
   }
   if (codigo === "plataforma.permissoes") {
     const [{ funcs, permissoes }, perfis] = await Promise.all([carregarMatriz(), carregarPerfis()]);

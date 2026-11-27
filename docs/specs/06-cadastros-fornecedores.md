@@ -10,6 +10,7 @@ Quem acessa: perfis com permissão em `cadastros.fornecedores`.
 ## Formulário
 - Empresa: mesmos campos de 2.2 Clientes (tipo, CNPJ/CPF, razão social, nome fantasia, inscrição estadual, situação).
 - O que fornece: categorias (uma ou mais, obrigatório) e descrição dos serviços.
+- Itens oferecidos: itens do catálogo das categorias marcadas, sem preço (veja [07-cadastros-catalogo.md](07-cadastros-catalogo.md)).
 - Contato: nome, cargo, e-mail, celular, telefone fixo (opcional), site.
 - Pagamento (tudo opcional): meios aceitos, chave PIX (tipo + chave), banco (sugestões ao digitar, aceita qualquer um), agência, conta, tipo de conta, titular.
 - Endereço e observações como em 2.2.
@@ -32,7 +33,7 @@ Cartão de crédito, Cartão de débito, Cheque, Permuta. O meio usado em cada c
 | Chave inválida | Chave PIX: CNPJ inválido. / CPF inválido. / e-mail inválido. / celular inválido. |
 
 ## Banco
-- Mesma tabela `empresa` (papel `fornecedor`), campos `categorias[]` e `meios_pagamento[]`; gravação por `salvar_empresa('fornecedor', ...)`.
+- Mesma tabela `empresa` (papel `fornecedor`), campos `categorias[]` e `meios_pagamento[]`; gravação por `salvar_fornecedor(...)`, que usa `salvar_empresa('fornecedor', ...)` e grava os itens oferecidos (`fornecedor_item`).
 - Código: `apps/web/src/app/(painel)/cadastros/` (partes comuns em `CamposEmpresa.tsx`).
 
 ## Próximo

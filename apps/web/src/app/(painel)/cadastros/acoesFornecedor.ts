@@ -10,6 +10,7 @@ import { CATEGORIAS, CONTA_TIPOS, MEIOS_PAGAMENTO, PIX_TIPOS, type DadosForneced
 
 const maiusc = (s: string) => s.trim().replace(/\s+/g, " ").toLocaleUpperCase("pt-BR");
 const so = (s: string) => s.replace(/\D/g, "");
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function falha(erro: string): Resultado {
   return { ok: false, erro };
@@ -51,9 +52,10 @@ function validar(d: DadosFornecedor): string | null {
 }
 
 /** Cria ou edita um fornecedor (2.3). Se o CNPJ/CPF já for de um cliente, o banco junta os cadastros. */
-export async function salvarFornecedor(d: DadosFornecedor): Promise<Resultado & { id?: string }> {
+export async function salvarFornecedor(d: DadosFornecedor, itens: string[]): Promise<Resultado & { id?: string }> {
   const erro = validar(d);
   if (erro) return falha(erro);
+  if (!Array.isArray(itens) || itens.some((i) => !UUID.test(i))) return falha("Lista de itens inválida.");
   const pj = d.tipo_pessoa === "pj";
   const pixNumerico = ["cnpj", "cpf", "celular"].includes(d.pix_tipo);
   const dados = {
@@ -87,11 +89,15 @@ export async function salvarFornecedor(d: DadosFornecedor): Promise<Resultado & 
     cidade: maiusc(d.cidade),
     uf: d.uf,
     observacoes: d.observacoes.trim(),
+    itens,
   };
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("salvar_empresa", { p_tipo: "fornecedor", p_id: d.id ?? null, p_dados: dados });
+  const { data, error } = await supabase.rpc("salvar_fornecedor", { p_id: d.id ?? null, p_dados: dados });
   if (error) return erroBanco(error.message);
   revalidatePath("/m/cadastros.fornecedores");
   revalidatePath("/m/cadastros.clientes");
+  revalidatePath("/m/cadastros.servicos");
+  revalidatePath("/m/cadastros.mercadorias");
+  revalidatePath("/m/cadastros.equipamentos");
   return { ok: true, mensagem: "Fornecedor salvo.", id: data as string };
 }

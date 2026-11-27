@@ -20,6 +20,8 @@ import {
   type DadosFornecedor,
 } from "./fornecedorRegras";
 import { Marcadores } from "./Marcadores";
+import { ItensOferecidos } from "./ItensOferecidos";
+import type { ItemOferta } from "./catalogoRegras";
 
 /** Máscara da chave PIX conforme o tipo escolhido. */
 function formatarChave(tipo: string, v: string): string {
@@ -31,7 +33,17 @@ function formatarChave(tipo: string, v: string): string {
 }
 
 /** 2.3 Fornecedores: ficha de cadastro e edição, conforme a prévia aprovada. */
-export function FornecedorForm({ inicial, tambemCliente }: { inicial: DadosFornecedor; tambemCliente: boolean }) {
+export function FornecedorForm({
+  inicial,
+  tambemCliente,
+  catalogo,
+  marcadosInicial,
+}: {
+  inicial: DadosFornecedor;
+  tambemCliente: boolean;
+  catalogo: ItemOferta[];
+  marcadosInicial: string[];
+}) {
   const router = useRouter();
   const novo = !inicial.id;
   const preparar = (x: DadosFornecedor): DadosFornecedor => ({
@@ -45,6 +57,8 @@ export function FornecedorForm({ inicial, tambemCliente }: { inicial: DadosForne
   const [d, setD] = useState<DadosFornecedor>(preparar(inicial));
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null);
   const [pendente, iniciar] = useTransition();
+  const [itens, setItens] = useState<ItemOferta[]>(catalogo);
+  const [marcados, setMarcados] = useState<string[]>(marcadosInicial);
   const set = (p: Partial<DadosFornecedor>) => setD((atual) => ({ ...atual, ...p }));
 
   /** Cadastro único: o CNPJ/CPF já é de um cliente; carrega os dados em comum. */
@@ -56,7 +70,8 @@ export function FornecedorForm({ inicial, tambemCliente }: { inicial: DadosForne
     e.preventDefault();
     setMsg(null);
     iniciar(async () => {
-      const r = await salvarFornecedor(d);
+      const ids = marcados.filter((id) => itens.some((i) => i.id === id && d.categorias.includes(i.categoria)));
+      const r = await salvarFornecedor(d, ids);
       if (!r.ok) {
         setMsg({ ok: false, texto: r.erro });
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -112,6 +127,14 @@ export function FornecedorForm({ inicial, tambemCliente }: { inicial: DadosForne
         </Campo>
         <span className="pl-hint">Marque todas as categorias que o fornecedor oferece.</span>
       </section>
+
+      <ItensOferecidos
+        itens={itens}
+        categorias={d.categorias}
+        marcados={marcados}
+        onMudar={setMarcados}
+        onItemNovo={(i) => setItens((a) => [...a, i])}
+      />
 
       <section className="pl-sec">
         <h3>Contato principal</h3>
