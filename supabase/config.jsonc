@@ -295,6 +295,10 @@
         "confirmation": {
           "subject": "Orizon Pass: confirme o seu e-mail",
           "content_path": "./supabase/templates/confirmar-email.html"
+        },
+        "magic_link": {
+          "subject": "Orizon Pass: seu código de acesso",
+          "content_path": "./supabase/templates/codigo-acesso.html"
         }
       },
 

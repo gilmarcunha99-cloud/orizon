@@ -36,6 +36,9 @@ export default async function InicioPage() {
 
   const perfis = (perfil?.usuario_perfil ?? []) as unknown as { perfil: string; subtipo: { nome: string } | null }[];
 
+  // Visitante que criou a conta mas não terminou o cadastro volta para a última etapa.
+  if (!perfil?.nome && perfis.every((p) => p.perfil === "visitante")) redirect("/primeiro-acesso?etapa=cadastro");
+
   return (
     <div className="page">
       <main className="card">
