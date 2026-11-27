@@ -6,7 +6,7 @@ export const NOME_PERFIL: Record<string, string> = {
   diretor: "Diretor(a)",
   organizador: "Organizador(a)",
   coordenador: "Coordenador(a)",
-  terceiros: "Terceiros",
+  terceiros: "Auxiliares",
   staff: "Staff",
   atleta: "Atleta",
   visitante: "Visitante",
