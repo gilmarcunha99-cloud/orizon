@@ -29,6 +29,8 @@ export type Painel = {
   email: string;
   nome: string;
   perfis: string[];
+  /** Nome exibido de cada perfil, como o Admin definiu na tela 1.3. */
+  perfisNomes: string[];
   modulos: Modulo[];
 };
 
@@ -77,5 +79,10 @@ export const carregarPainel = cache(async (): Promise<Painel | null> => {
       .filter((f) => liberadas.has(f.codigo)),
   })).filter((m) => m.itens.length);
 
-  return { userId: user.id, email: user.email ?? "", nome: usuario?.nome ?? "", perfis, modulos };
+  const { data: nomes } = perfis.length
+    ? await supabase.from("perfil").select("codigo, nome").in("codigo", perfis)
+    : { data: [] as { codigo: string; nome: string }[] };
+  const perfisNomes = perfis.map((p) => nomes?.find((n) => n.codigo === p)?.nome ?? NOME_PERFIL[p] ?? p);
+
+  return { userId: user.id, email: user.email ?? "", nome: usuario?.nome ?? "", perfis, perfisNomes, modulos };
 });

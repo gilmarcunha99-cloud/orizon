@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { carregarPainel, NOME_PERFIL } from "@/lib/painel";
+import { carregarPainel } from "@/lib/painel";
 import { Sidebar } from "./Sidebar";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +13,7 @@ export default async function PainelLayout({ children }: { children: React.React
       <Sidebar
         modulos={painel.modulos}
         nome={painel.nome || painel.email}
-        perfis={painel.perfis.map((p) => NOME_PERFIL[p] ?? p)}
+        perfis={painel.perfisNomes}
       />
       <div className="app-main">{children}</div>
     </div>
