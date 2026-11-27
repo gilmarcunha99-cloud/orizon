@@ -77,8 +77,13 @@ export function UsuarioForm({
   const menor = idade(d.data_nascimento) < 18;
   const setF = (p: Partial<FichaAtleta>) => setD({ ...d, ficha: { ...ficha, ...p } });
   const subs = subtipos.filter((s) => s.perfil === d.perfil && (s.ativo || s.id === d.subtipo_id));
+  // Atleta só entra pelo celular ou pela planilha de 3.3 Inscrições (regra de 27/11/2026): não aparece como opção aqui,
+  // a não ser para quem já é atleta.
   const opcoesPerfil = perfis.filter(
-    (p) => (p.ativo || p.codigo === inicial.perfil) && (souAdmin || p.codigo !== "admin" || inicial.perfil === "admin"),
+    (p) =>
+      (p.ativo || p.codigo === inicial.perfil) &&
+      (souAdmin || p.codigo !== "admin" || inicial.perfil === "admin") &&
+      (p.codigo !== "atleta" || inicial.perfil === "atleta"),
   );
   const travaPerfil = (inicial.perfil === "admin" && !souAdmin) || (souEu && inicial.perfil === "admin");
 
@@ -232,7 +237,8 @@ export function UsuarioForm({
         </div>
         <span className="pl-hint">
           Cada pessoa tem <b>um perfil só</b>. Se um Staff correr uma prova, ele continua Staff e ganha apenas uma inscrição de
-          atleta naquele evento.
+          atleta naquele evento. O <b>Atleta</b> não é cadastrado aqui: ele entra pelo cadastro no celular ou pela planilha em
+          3.3 Inscrições.
         </span>
       </section>
 
