@@ -3,16 +3,32 @@
 Passos feitos uma única vez. Os que dependem de conta (Supabase, Vercel, Mailgrid) são feitos pelo Gilmar;
 o restante já está no repositório.
 
+## Situação em 27/11/2026
+
+| Item | Situação |
+| --- | --- |
+| Banco `orizon-homolog` (Supabase, São Paulo) | Feito (26/11) |
+| Login e e-mails (seção 2) | Feito, **menos o SMTP do Mailgrid**: por enquanto saem os e-mails padrão do Supabase (só link, sem código) |
+| Segredos do GitHub (seção 3) | **Não configurados**: as migrações são aplicadas à mão (veja abaixo) |
+| Site de homologação (seção 4) | No ar em https://orizon-git-homolog-zumar1.vercel.app (o domínio `homolog.orizonsportss.com.br` fica para depois) |
+| Admin (seção 5) | Feito: e-mail do Gilmar, só com o perfil Admin |
+| App de celular (seção 6) | Ainda não começou |
+
+**Como aplicar uma migração enquanto não há segredos no GitHub:** abra o **SQL Editor** do Supabase, rode o arquivo
+de `supabase/migrations/` e registre a versão em `supabase_migrations.schema_migrations`.
+Atenção: neste projeto as tabelas novas **não** ficam liberadas sozinhas para usuários logados; cada tabela nova
+precisa dos `grant` (a migração `20261127030000` já deixa a regra padrão para as próximas).
+
 ## 1. Supabase: criar o banco de homologação
 
 1. Em https://supabase.com, crie a organização Orizon (plano gratuito) e um projeto:
    - Nome: `orizon-homolog`
    - Região: **South America (São Paulo)**
    - Guarde a senha do banco num gerenciador de senhas.
-2. Em **Project Settings › API**, anote:
+2. Em **Project Settings › API Keys**, anote:
    - Project URL
-   - chave `anon` (pública)
-   - chave `service_role` (secreta: nunca colar em chat, e-mail ou no app)
+   - chave **Publishable** (pública; antiga `anon`)
+   - chave **Secret** (secreta, antiga `service_role`: nunca colar em chat, e-mail ou no app)
    - o **Project ID** (aparece na URL do painel)
 
 ## 2. Supabase: login e e-mails
@@ -20,7 +36,7 @@ o restante já está no repositório.
 Em **Authentication**:
 
 - **URL Configuration**
-  - Site URL: endereço da homologação (ex.: `https://homolog.orizonsportss.com.br`)
+  - Site URL: endereço da homologação (hoje `https://orizon-git-homolog-zumar1.vercel.app`; no futuro `https://homolog.orizonsportss.com.br`)
   - Redirect URLs: o mesmo endereço com `/**` no final
 - **Providers › Email**: Confirm email ligado; Email OTP length = 6; Email OTP expiration = 86400 (24 horas)
 - **Policies / Passwords**: mínimo 8 caracteres; exigir minúsculas, maiúsculas, números e símbolos
@@ -32,6 +48,8 @@ Em **Authentication**:
   - Invite user → `convite.html` (assunto: "Orizon Pass: crie a sua senha")
   - Reset password → `redefinir-senha.html` (assunto: "Orizon Pass: código para redefinir a senha")
   - Confirm signup → `confirmar-email.html` (assunto: "Orizon Pass: confirme o seu e-mail")
+  - Magic link → `codigo-acesso.html` (assunto: "Orizon Pass: seu código de acesso")
+  - Os modelos só podem ser trocados depois que o SMTP próprio (Mailgrid) estiver ligado.
 
 ## 3. GitHub: segredos e proteção das branches
 
@@ -44,7 +62,7 @@ Em **Authentication**:
 ## 4. Vercel: publicar a homologação
 
 1. No GitHub, em **Settings › Integrations › GitHub Apps › Vercel › Configure**, libere o repositório `orizon`
-   (em 20/11 a Vercel não enxergava o repositório; sem isso não há publicação automática).
+   (feito: desde 26/11 cada pull request ganha uma prévia e a branch `homolog` é publicada sozinha).
 2. No projeto `orizon` da Vercel, **Settings › Build and Deployment**:
    - Framework Preset: **Next.js**
    - Root Directory: `apps/web`
@@ -52,8 +70,8 @@ Em **Authentication**:
 3. **Settings › Environment Variables**, ambiente **Preview**, branch `homolog`:
    - `NEXT_PUBLIC_APP_ENV` = `homolog`
    - `NEXT_PUBLIC_SUPABASE_URL` = Project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = chave anon
-   - `SUPABASE_SERVICE_ROLE_KEY` = chave service_role
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = chave Publishable
+   - `SUPABASE_SERVICE_ROLE_KEY` = chave Secret (usada para enviar convites a novos usuários)
 4. **Settings › Domains**: adicione `homolog.orizonsportss.com.br` ligado à branch `homolog` e crie o CNAME
    indicado pela Vercel no provedor do domínio.
 
@@ -80,7 +98,7 @@ Ou pelo terminal, em `apps/web` com o `.env.local` preenchido: `npm run criar-ad
 
 ```bash
 cd apps/mobile
-cp env/homolog.example.json env/homolog.json   # preencha URL e chave anon
+cp env/homolog.example.json env/homolog.json   # preencha URL e chave Publishable
 flutter build apk --flavor homolog --dart-define-from-file=env/homolog.json
 ```
 
