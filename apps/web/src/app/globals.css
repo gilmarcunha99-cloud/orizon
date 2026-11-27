@@ -303,3 +303,18 @@ a:focus-visible, button:focus-visible, input[type=checkbox]:focus-visible {
 .pl-ord-ic .on { color: var(--oz-blue); }
 .pl-ord-txt { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--oz-orange-text); }
 .pl-ord:focus-visible { outline: 2px solid var(--oz-orange); outline-offset: 2px; border-radius: 4px; }
+
+/* 2.1 Usuários: ficha (prévia A aprovada em 27/11/2026) */
+.pl-form { display: flex; flex-direction: column; gap: 20px; max-width: 1100px; }
+.pl-sec { display: flex; flex-direction: column; gap: 16px; padding: 20px 22px; border: 1px solid #DDE1E1; border-radius: 12px; background: #FFFFFF; }
+.pl-sec h3 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.pl-tag { padding: 3px 9px; border-radius: 999px; background: var(--oz-orange-soft); color: var(--oz-orange-text); font-size: 11px; font-weight: 600; }
+.pl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 16px; }
+.pl-grid .pl-c2 { grid-column: span 2; }
+.pl-grid .pl-inp, .pl-grid .pl-sel { width: 100%; }
+.pl-req { color: var(--oz-danger); }
+.pl-callout { padding: 12px 16px; border-radius: 10px; background: #E1ECEE; font-size: 14px; }
+.pl-acts { display: flex; justify-content: flex-end; gap: 10px; }
+.pl-b-link { display: inline-flex; align-items: center; text-decoration: none; }
+.crumb a { color: inherit; }
+@media (max-width: 900px) { .pl-grid { grid-template-columns: 1fr; } .pl-grid .pl-c2 { grid-column: auto; } }
