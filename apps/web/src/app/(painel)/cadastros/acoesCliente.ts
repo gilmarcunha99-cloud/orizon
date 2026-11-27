@@ -20,7 +20,7 @@ function erroBanco(msg: string | undefined): Resultado {
   if (m.includes("empresa_documento_unico")) return falha("Esse CNPJ/CPF já está cadastrado.");
   if (m.includes("row-level security") || m.includes("permission denied") || m.startsWith("Sem permissão"))
     return falha("Você não tem permissão para salvar clientes.");
-  if (/^(Escolha|Informe|Esse CNPJ|Esse CPF|Cliente não)/.test(m)) return falha(m);
+  if (/^(Escolha|Informe|Esse CNPJ|Esse CPF|Cliente não|Cadastro não)/.test(m)) return falha(m);
   return falha("Não foi possível salvar. Tente de novo em instantes.");
 }
 

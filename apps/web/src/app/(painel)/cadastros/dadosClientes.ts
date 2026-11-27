@@ -28,7 +28,7 @@ export async function carregarClientes(): Promise<ClienteLinha[]> {
   const [c, ev] = await Promise.all([
     supabase
       .from("empresa")
-      .select("id, tipo_pessoa, nome, razao_social, documento, contato_nome, email, celular, telefone, cidade, uf, ativo")
+      .select("id, tipo_pessoa, nome, razao_social, documento, contato_nome, email, celular, telefone, cidade, uf, tipos_inativos")
       .contains("tipos", ["cliente"])
       .is("excluido_em", null),
     supabase.rpc("eventos_do_cliente"),
@@ -37,7 +37,11 @@ export async function carregarClientes(): Promise<ClienteLinha[]> {
   checar(ev.error);
   const conta = new Map<string, number>();
   for (const e of (ev.data ?? []) as EventoCliente[]) conta.set(e.cliente_id, (conta.get(e.cliente_id) ?? 0) + 1);
-  return (c.data ?? []).map((r) => ({ ...r, eventos: conta.get(r.id) ?? 0 }));
+  return (c.data ?? []).map(({ tipos_inativos, ...r }) => ({
+    ...r,
+    ativo: !(tipos_inativos ?? []).includes("cliente"),
+    eventos: conta.get(r.id) ?? 0,
+  }));
 }
 
 /** Ficha de um cliente com os eventos ligados. Retorna null se não existir. */
@@ -56,5 +60,6 @@ export async function carregarCliente(id: string): Promise<{ dados: DadosCliente
     const v = r[k];
     if (v !== null && v !== undefined) (dados as Record<string, unknown>)[k] = v;
   }
+  dados.ativo = !((r.tipos_inativos as string[] | null) ?? []).includes("cliente");
   return { dados, eventos: (ev.data ?? []) as EventoCliente[] };
 }

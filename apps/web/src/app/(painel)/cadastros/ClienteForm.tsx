@@ -5,32 +5,17 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { formatarCelular } from "@/lib/validation";
 import { Aviso } from "../plataforma/Gaveta";
-import { UFS, formatarCpf } from "../plataforma/usuarioRegras";
 import { salvarCliente } from "./acoesCliente";
-import { formatarCep, formatarCnpj, formatarTelefone, type DadosCliente, type EventoCliente } from "./clienteRegras";
+import { Campo, SecaoEndereco, SecaoIdentificacao, fmtDoc, maiusc, minusc } from "./CamposEmpresa";
+import { CLIENTE_VAZIO, formatarCep, formatarTelefone, type DadosCliente, type EventoCliente } from "./clienteRegras";
+import { deLinha } from "./fornecedorRegras";
 
-/** Nomes sempre em caixa alta e e-mails em minúsculo (regras de 27/11/2026). */
-const maiusc = (s: string) => s.toLocaleUpperCase("pt-BR");
-const minusc = (s: string) => s.toLowerCase().trim();
 const dataBR = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "—");
-
-function Campo({ rotulo, req, cls, children }: { rotulo: string; req?: boolean; cls?: string; children: React.ReactNode }) {
-  return (
-    <label className={`pl-fld ${cls ?? ""}`}>
-      <span>
-        {rotulo}
-        {req && <span className="pl-req"> *</span>}
-      </span>
-      {children}
-    </label>
-  );
-}
 
 /** 2.2 Clientes: ficha de cadastro e edição, conforme a prévia aprovada. */
 export function ClienteForm({ inicial, eventos }: { inicial: DadosCliente; eventos: EventoCliente[] }) {
   const router = useRouter();
   const novo = !inicial.id;
-  const fmtDoc = (tipo: string, v: string) => (tipo === "pj" ? formatarCnpj(v) : formatarCpf(v));
   const [d, setD] = useState<DadosCliente>({
     ...inicial,
     documento: fmtDoc(inicial.tipo_pessoa, inicial.documento),
@@ -39,38 +24,21 @@ export function ClienteForm({ inicial, eventos }: { inicial: DadosCliente; event
     cep: formatarCep(inicial.cep),
   });
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null);
-  const [buscandoCep, setBuscandoCep] = useState(false);
   const [pendente, iniciar] = useTransition();
-  const pj = d.tipo_pessoa === "pj";
   const set = (p: Partial<DadosCliente>) => setD((atual) => ({ ...atual, ...p }));
 
-  /** Ao completar o CEP, preenche rua, bairro, cidade e UF pelo serviço público ViaCEP. */
-  async function mudarCep(valor: string) {
-    const cep = formatarCep(valor);
-    set({ cep });
-    const so = cep.replace(/\D/g, "");
-    if (so.length !== 8) return;
-    setBuscandoCep(true);
-    try {
-      const r = await fetch(`https://viacep.com.br/ws/${so}/json/`);
-      const j = (await r.json()) as { erro?: boolean; logradouro?: string; bairro?: string; localidade?: string; uf?: string };
-      if (j.erro) {
-        setMsg({ ok: false, texto: "CEP não encontrado. Preencha o endereço manualmente." });
-        return;
-      }
-      setMsg(null);
-      setD((atual) => ({
-        ...atual,
-        logradouro: maiusc(j.logradouro || atual.logradouro),
-        bairro: maiusc(j.bairro || atual.bairro),
-        cidade: maiusc(j.localidade || atual.cidade),
-        uf: j.uf || atual.uf,
-      }));
-    } catch {
-      // Sem conexão com o serviço de CEP: segue com preenchimento manual.
-    } finally {
-      setBuscandoCep(false);
-    }
+  /** Cadastro único: o CNPJ/CPF já é de um fornecedor; carrega os dados em comum. */
+  function aproveitar(linha: Record<string, unknown>) {
+    const x = deLinha(CLIENTE_VAZIO, linha);
+    setD((atual) => ({
+      ...x,
+      tipo_pessoa: atual.tipo_pessoa,
+      documento: atual.documento,
+      ativo: true,
+      celular: formatarCelular(x.celular),
+      telefone: formatarTelefone(x.telefone),
+      cep: formatarCep(x.cep),
+    }));
   }
 
   function salvar(e: React.FormEvent) {
@@ -101,66 +69,13 @@ export function ClienteForm({ inicial, eventos }: { inicial: DadosCliente; event
       </p>
       <Aviso msg={msg} />
 
-      <section className="pl-sec">
-        <h3>Identificação</h3>
-        <div className="pl-grid">
-          <Campo rotulo="Tipo de pessoa" req>
-            <select
-              className="pl-sel"
-              value={d.tipo_pessoa}
-              onChange={(e) => {
-                const t = e.target.value as DadosCliente["tipo_pessoa"];
-                set({ tipo_pessoa: t, documento: fmtDoc(t, d.documento) });
-              }}
-            >
-              <option value="pj">Jurídica (CNPJ)</option>
-              <option value="pf">Física (CPF)</option>
-            </select>
-          </Campo>
-          <Campo rotulo={pj ? "CNPJ" : "CPF"} req>
-            <input
-              className="pl-inp"
-              required
-              inputMode="numeric"
-              placeholder={pj ? "00.000.000/0000-00" : "000.000.000-00"}
-              value={d.documento}
-              onChange={(e) => set({ documento: fmtDoc(d.tipo_pessoa, e.target.value) })}
-            />
-          </Campo>
-          <Campo rotulo="Situação" req>
-            <select className="pl-sel" value={d.ativo ? "1" : "0"} onChange={(e) => set({ ativo: e.target.value === "1" })}>
-              <option value="1">Ativo</option>
-              <option value="0">Inativo</option>
-            </select>
-          </Campo>
-          <Campo rotulo={pj ? "Razão social" : "Nome completo"} req cls="pl-c2">
-            <input
-              className="pl-inp"
-              required
-              maxLength={150}
-              value={d.razao_social}
-              onChange={(e) => set({ razao_social: maiusc(e.target.value) })}
-            />
-          </Campo>
-          {pj && (
-            <Campo rotulo="Inscrição estadual">
-              <input
-                className="pl-inp"
-                maxLength={20}
-                placeholder="Opcional"
-                value={d.inscricao_estadual}
-                onChange={(e) => set({ inscricao_estadual: maiusc(e.target.value) })}
-              />
-            </Campo>
-          )}
-          <Campo rotulo="Nome fantasia" req cls="pl-c2">
-            <input className="pl-inp" required maxLength={120} value={d.nome} onChange={(e) => set({ nome: maiusc(e.target.value) })} />
-          </Campo>
-        </div>
-        <span className="pl-hint">
-          Pessoa física: troca CNPJ por CPF e Razão social por Nome completo. Nomes ficam sempre em CAIXA ALTA.
-        </span>
-      </section>
+      <SecaoIdentificacao
+        d={d}
+        set={set}
+        papel="cliente"
+        onAproveitar={aproveitar}
+        dica="Pessoa física: troca CNPJ por CPF e Razão social por Nome completo. Nomes ficam sempre em CAIXA ALTA."
+      />
 
       <section className="pl-sec">
         <h3>Contato principal</h3>
@@ -211,46 +126,7 @@ export function ClienteForm({ inicial, eventos }: { inicial: DadosCliente; event
         </div>
       </section>
 
-      <section className="pl-sec">
-        <h3>Endereço</h3>
-        <div className="pl-grid">
-          <Campo rotulo={buscandoCep ? "CEP (buscando…)" : "CEP"}>
-            <input
-              className="pl-inp"
-              inputMode="numeric"
-              placeholder="00000-000"
-              value={d.cep}
-              onChange={(e) => mudarCep(e.target.value)}
-            />
-          </Campo>
-          <Campo rotulo="Rua / Avenida" cls="pl-c2">
-            <input className="pl-inp" maxLength={150} value={d.logradouro} onChange={(e) => set({ logradouro: maiusc(e.target.value) })} />
-          </Campo>
-          <Campo rotulo="Número">
-            <input className="pl-inp" maxLength={10} value={d.numero} onChange={(e) => set({ numero: maiusc(e.target.value) })} />
-          </Campo>
-          <Campo rotulo="Complemento">
-            <input className="pl-inp" maxLength={60} value={d.complemento} onChange={(e) => set({ complemento: maiusc(e.target.value) })} />
-          </Campo>
-          <Campo rotulo="Bairro">
-            <input className="pl-inp" maxLength={80} value={d.bairro} onChange={(e) => set({ bairro: maiusc(e.target.value) })} />
-          </Campo>
-          <Campo rotulo="Cidade">
-            <input className="pl-inp" maxLength={80} value={d.cidade} onChange={(e) => set({ cidade: maiusc(e.target.value) })} />
-          </Campo>
-          <Campo rotulo="UF">
-            <select className="pl-sel" value={d.uf} onChange={(e) => set({ uf: e.target.value })}>
-              <option value="">—</option>
-              {UFS.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </select>
-          </Campo>
-        </div>
-        <span className="pl-hint">Ao digitar o CEP, rua, bairro, cidade e UF são preenchidos sozinhos.</span>
-      </section>
+      <SecaoEndereco d={d} set={set} aoErro={(t) => setMsg(t ? { ok: false, texto: t } : null)} />
 
       <section className="pl-sec">
         <h3>Observações</h3>
