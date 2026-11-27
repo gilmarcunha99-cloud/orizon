@@ -22,3 +22,22 @@ export function authErrorMessage(message?: string): string {
   if (m.includes("weak") || m.includes("password should")) return "A senha não atende às regras de segurança.";
   return "Não foi possível concluir agora. Tente de novo.";
 }
+
+/** Celular brasileiro com DDD: 11 dígitos, começando com 9 depois do DDD. */
+export const celularOk = (s: string) => /^\d{2}9\d{8}$/.test(s.replace(/\D/g, ""));
+
+/** Máscara (00) 00000-0000 enquanto digita. */
+export function formatarCelular(s: string): string {
+  const d = s.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d ? `(${d}` : "";
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+/** Data de nascimento no passado e com até 120 anos. */
+export function nascimentoOk(iso: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return false;
+  const d = new Date(`${iso}T00:00:00`);
+  const hoje = new Date();
+  return !Number.isNaN(d.getTime()) && d < hoje && hoje.getFullYear() - d.getFullYear() <= 120;
+}
