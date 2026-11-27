@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { supabaseAnonKey, supabaseConfigured, supabaseUrl } from "@/lib/env";
 
 /** Rotas que exigem login. */
-const PROTECTED = ["/inicio"];
+const PROTECTED = ["/inicio", "/m/"];
 
 /** Renova a sessão a cada requisição e protege as rotas internas. */
 export async function updateSession(request: NextRequest) {
