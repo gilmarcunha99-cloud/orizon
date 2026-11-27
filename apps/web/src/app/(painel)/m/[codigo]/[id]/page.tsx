@@ -8,6 +8,7 @@ import { UsuarioForm } from "../../../plataforma/UsuarioForm";
 import { situacaoAcesso } from "../../../plataforma/acesso";
 import type { DadosUsuario } from "../../../plataforma/usuarioRegras";
 import { ClientePagina } from "../../../cadastros/ClientePagina";
+import { FornecedorPagina } from "../../../cadastros/FornecedorPagina";
 
 type Params = Promise<{ codigo: string; id: string }>;
 type Busca = Promise<{ salvo?: string }>;
@@ -21,6 +22,7 @@ export default async function UsuarioPage({ params, searchParams }: { params: Pa
   const { codigo, id } = await params;
   const { salvo } = await searchParams;
   if (codigo === "cadastros.clientes" && (id === "novo" || UUID.test(id))) return <ClientePagina id={id} salvo={salvo} />;
+  if (codigo === "cadastros.fornecedores" && (id === "novo" || UUID.test(id))) return <FornecedorPagina id={id} salvo={salvo} />;
   if (codigo !== "cadastros.usuarios" || (id !== "novo" && !UUID.test(id))) notFound();
 
   const painel = await carregarPainel();
