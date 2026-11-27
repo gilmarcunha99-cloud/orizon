@@ -197,7 +197,7 @@ a:focus-visible, button:focus-visible, input[type=checkbox]:focus-visible {
 .nav-on { background: #00323A; border-left-color: var(--oz-orange); color: #FFFFFF; font-weight: 600; }
 .nav-on .n { color: var(--oz-orange); }
 .side-user { border-top: 1px solid #1A5A65; padding: 16px 20px 20px; }
-.side-user-nome { font-size: 13px; font-weight: 700; letter-spacing: .04em; word-break: break-word; }
+.side-user-nome { font-size: 11px; font-weight: 400; letter-spacing: .04em; word-break: break-word; }
 .side-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .side-badge { padding: 3px 10px; border-radius: 999px; background: var(--oz-orange-soft); color: var(--oz-orange-text); font-size: 11px; font-weight: 600; letter-spacing: .08em; }
 .side-sair { margin-top: 12px; padding: 4px 0; min-height: 32px; border: 0; background: none; color: #F0A24A; font: 500 14px var(--oz-font); text-decoration: underline; cursor: pointer; }
