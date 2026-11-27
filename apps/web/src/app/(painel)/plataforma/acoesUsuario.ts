@@ -8,6 +8,8 @@ import { EMAIL_RE, celularOk, nascimentoOk } from "@/lib/validation";
 import type { Resultado } from "./acoes";
 import { cpfOk, idade, type DadosUsuario } from "./usuarioRegras";
 
+/** Nomes próprios em caixa alta, sem espaços repetidos. */
+const maiusc = (s: string) => s.trim().replace(/\s+/g, " ").toLocaleUpperCase("pt-BR");
 const so = (s: string | undefined) => (s ?? "").replace(/\D/g, "");
 
 function falha(erro: string): Resultado {
@@ -52,7 +54,7 @@ export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?:
   const email = d.email.trim().toLowerCase();
   const menor = idade(d.data_nascimento) < 18;
   const dados = {
-    nome: d.nome.trim(),
+    nome: maiusc(d.nome),
     cpf: so(d.cpf),
     celular: so(d.celular),
     data_nascimento: d.data_nascimento,
@@ -63,9 +65,11 @@ export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?:
     ficha: d.ficha
       ? {
           ...d.ficha,
-          cidade: d.ficha.cidade.trim(),
+          cidade: maiusc(d.ficha.cidade),
+          grupo: maiusc(d.ficha.grupo),
+          emergencia_nome: maiusc(d.ficha.emergencia_nome),
           emergencia_celular: so(d.ficha.emergencia_celular),
-          responsavel_nome: menor ? d.ficha.responsavel_nome.trim() : "",
+          responsavel_nome: menor ? maiusc(d.ficha.responsavel_nome) : "",
           responsavel_cpf: menor ? so(d.ficha.responsavel_cpf) : "",
           responsavel_celular: menor ? so(d.ficha.responsavel_celular) : "",
         }

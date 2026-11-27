@@ -21,6 +21,8 @@ import {
 } from "./usuarioRegras";
 
 const ORIGEM: Record<string, string> = { importacao: "Planilha", inscricao: "Celular", manual: "Manual" };
+/** Nomes próprios sempre em caixa alta (regra de 27/11/2026). */
+const maiusc = (s: string) => s.toLocaleUpperCase("pt-BR");
 const dataBR = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "—");
 
 function Campo({ rotulo, req, cls, children }: { rotulo: string; req?: boolean; cls?: string; children: React.ReactNode }) {
@@ -124,7 +126,7 @@ export function UsuarioForm({
         </h3>
         <div className="pl-grid">
           <Campo rotulo="Nome completo" req cls="pl-c2">
-            <input className="pl-inp" required maxLength={120} value={d.nome} onChange={(e) => setD({ ...d, nome: e.target.value })} />
+            <input className="pl-inp" required maxLength={120} value={d.nome} onChange={(e) => setD({ ...d, nome: maiusc(e.target.value) })} />
           </Campo>
           <Campo rotulo="CPF" req>
             <input
@@ -138,7 +140,7 @@ export function UsuarioForm({
           </Campo>
           <Campo rotulo="E-mail (login)" req cls="pl-c2">
             {novo ? (
-              <input className="pl-inp" type="email" required value={d.email} onChange={(e) => setD({ ...d, email: e.target.value })} />
+              <input className="pl-inp" type="email" required value={d.email} onChange={(e) => setD({ ...d, email: e.target.value.toLowerCase().trim() })} />
             ) : (
               <div className="pl-ro">{d.email}</div>
             )}
@@ -241,7 +243,7 @@ export function UsuarioForm({
           </h3>
           <div className="pl-grid">
             <Campo rotulo="Cidade" req cls="pl-c2">
-              <input className="pl-inp" required maxLength={80} value={ficha.cidade} onChange={(e) => setF({ cidade: e.target.value })} />
+              <input className="pl-inp" required maxLength={80} value={ficha.cidade} onChange={(e) => setF({ cidade: maiusc(e.target.value) })} />
             </Campo>
             <Campo rotulo="UF" req>
               <select className="pl-sel" required value={ficha.uf} onChange={(e) => setF({ uf: e.target.value })}>
@@ -269,7 +271,7 @@ export function UsuarioForm({
                 maxLength={80}
                 placeholder="Opcional"
                 value={ficha.grupo}
-                onChange={(e) => setF({ grupo: e.target.value })}
+                onChange={(e) => setF({ grupo: maiusc(e.target.value) })}
               />
             </Campo>
             <Campo rotulo="Contato de emergência: nome" req cls="pl-c2">
@@ -278,7 +280,7 @@ export function UsuarioForm({
                 required
                 maxLength={120}
                 value={ficha.emergencia_nome}
-                onChange={(e) => setF({ emergencia_nome: e.target.value })}
+                onChange={(e) => setF({ emergencia_nome: maiusc(e.target.value) })}
               />
             </Campo>
             <Campo rotulo="Contato de emergência: celular" req>
@@ -315,7 +317,7 @@ export function UsuarioForm({
                     required
                     maxLength={120}
                     value={ficha.responsavel_nome}
-                    onChange={(e) => setF({ responsavel_nome: e.target.value })}
+                    onChange={(e) => setF({ responsavel_nome: maiusc(e.target.value) })}
                   />
                 </Campo>
                 <Campo rotulo="Responsável legal: CPF" req>
