@@ -205,7 +205,7 @@ export function UsuarioForm({
               value={d.subtipo_id}
               onChange={(e) => setD({ ...d, subtipo_id: e.target.value })}
             >
-              <option value="">{subs.length ? "Sem sub-tipo" : "Este perfil não tem sub-tipos"}</option>
+              <option value="">{subs.length ? "Sem sub-tipo" : d.perfil ? "Este perfil não tem sub-tipos" : "Escolha o perfil primeiro"}</option>
               {subs.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.nome}

@@ -15,7 +15,7 @@ type Props = { modulos: Modulo[]; nome: string; perfis: string[] };
 export function Sidebar({ modulos, nome, perfis }: Props) {
   const pathname = usePathname();
   const router = useRouter();
-  const atual = pathname.startsWith("/m/") ? decodeURIComponent(pathname.slice(3)) : "";
+  const atual = pathname.startsWith("/m/") ? decodeURIComponent(pathname.slice(3).split("/")[0]) : "";
   const doAtual = modulos.find((m) => m.itens.some((i) => i.codigo === atual));
   const [modNome, setModNome] = useState(doAtual?.nome ?? modulos[0]?.nome ?? "");
   const [aberto, setAberto] = useState(false);
