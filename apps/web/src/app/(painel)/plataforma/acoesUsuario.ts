@@ -21,7 +21,7 @@ function erroBanco(msg: string | undefined): Resultado {
   if (m.includes("usuario_cpf_key")) return falha("Já existe uma pessoa cadastrada com esse CPF.");
   if (m.includes("row-level security") || m.includes("permission denied") || m.startsWith("Sem permissão"))
     return falha("Você não tem permissão para salvar usuários.");
-  if (/^(Escolha|Somente|Você não|O sub-tipo|Usuário não)/.test(m)) return falha(m);
+  if (/^(Escolha|Somente|Você não|O sub-tipo|Usuário não|Esse celular)/.test(m)) return falha(m);
   return falha("Não foi possível salvar. Tente de novo em instantes.");
 }
 
@@ -80,6 +80,14 @@ export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?:
   const porCpf = await supabase.from("usuario").select("id").eq("cpf", dados.cpf);
   if (porCpf.error) return erroBanco(porCpf.error.message);
   if ((porCpf.data ?? []).some((u) => u.id !== d.id)) return falha("Já existe uma pessoa cadastrada com esse CPF.");
+  // Celular também não repete. Na edição, só confere quando o número mudou (o banco faz a mesma regra).
+  const atual = d.id ? (await supabase.from("usuario").select("celular").eq("id", d.id).maybeSingle()).data?.celular : null;
+  if (atual !== dados.celular) {
+    const porCel = await supabase.from("usuario").select("id, nome, email").eq("celular", dados.celular).is("excluido_em", null);
+    if (porCel.error) return erroBanco(porCel.error.message);
+    const outro = (porCel.data ?? []).find((u) => u.id !== d.id);
+    if (outro) return falha(`Esse celular já está no cadastro de ${outro.nome || outro.email}.`);
+  }
   if (!d.id) {
     const porEmail = await supabase.from("usuario").select("id").eq("email", email);
     if (porEmail.error) return erroBanco(porEmail.error.message);
