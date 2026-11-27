@@ -238,6 +238,8 @@ export function ItemGaveta({
 
   function salvar(e: React.FormEvent) {
     e.preventDefault();
+    // Na ficha do fornecedor o painel fica dentro do formulário dele (via portal): não deixa salvar a ficha junto.
+    e.stopPropagation();
     setErro(null);
     iniciar(async () => {
       const r = await salvarItem(d);
