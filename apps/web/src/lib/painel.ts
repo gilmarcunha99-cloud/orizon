@@ -16,7 +16,7 @@ export const NOME_PERFIL: Record<string, string> = {
 
 /** Ordem e descrição curta dos módulos (modelagem revisada de 26/11/2026). */
 export const MODULOS = [
-  { nome: "Plataforma", descricao: "Integrações e regras de acesso" },
+  { nome: "Plataforma", descricao: "Configurações do App (exclusivo do Admin)" },
   { nome: "Cadastros", descricao: "Pessoas, empresas e itens" },
   { nome: "Eventos", descricao: "Do contrato ao resultado" },
   { nome: "Financeiro", descricao: "Orçamento, contas e prestação" },
@@ -63,13 +63,15 @@ export const carregarPainel = cache(async (): Promise<Painel | null> => {
     liberadas = new Set();
   }
 
-  // Numeração do protótipo aprovado: módulo 01, 02… e funcionalidade 1.01, 1.02…
-  const modulos: Modulo[] = MODULOS.map((m, mi) => ({
+  // Numeração da lista de módulos do Gilmar (27/11): 1.1, 1.2… 2.10, 2.11.
+  // Plataforma (configurações do App) é exclusiva do Admin, mesmo que a matriz libere algo.
+  const ehAdmin = perfis.includes("admin");
+  const modulos: Modulo[] = MODULOS.filter((m) => ehAdmin || m.nome !== "Plataforma").map((m) => ({
     ...m,
-    num: String(mi + 1).padStart(2, "0"),
+    num: String(MODULOS.indexOf(m) + 1),
     itens: (funcs ?? [])
       .filter((f) => f.modulo === m.nome)
-      .map((f, fi) => ({ codigo: f.codigo, nome: f.nome, num: `${mi + 1}.${String(fi + 1).padStart(2, "0")}` }))
+      .map((f, fi) => ({ codigo: f.codigo, nome: f.nome, num: `${MODULOS.indexOf(m) + 1}.${fi + 1}` }))
       .filter((f) => liberadas.has(f.codigo)),
   })).filter((m) => m.itens.length);
 
