@@ -14,7 +14,7 @@ supabase/
   migrations/ alterações do banco, numeradas, aplicadas em homologação e depois em produção
   templates/  e-mails de login (código de 6 dígitos e link)
   seed.sql    dados de teste do ambiente local
-docs/         passo a passo de ambientes e decisões
+docs/         passo a passo de ambientes e specs das funcionalidades (docs/specs)
 .github/      verificações automáticas
 ```
 
@@ -48,3 +48,8 @@ flutter run --flavor homolog --dart-define-from-file=env/homolog.json
 ```
 
 Banco local (opcional, precisa de Docker): `npx supabase start` na raiz aplica as migrações e o `seed.sql`.
+
+## Documentação
+
+- Specs das funcionalidades: [docs/specs/](docs/specs/README.md).
+- Todo pull request que cria ou muda uma funcionalidade atualiza o spec dela e os documentos afetados no mesmo pull request.
