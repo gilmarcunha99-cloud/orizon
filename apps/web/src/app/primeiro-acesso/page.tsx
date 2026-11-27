@@ -1,26 +1,10 @@
-import type { Metadata } from "next";
-import { Brand } from "@/components/Brand";
-import { ConfigPending } from "@/components/ConfigPending";
-import { supabaseConfigured } from "@/lib/env";
-import { PrimeiroAcessoFlow } from "./PrimeiroAcessoFlow";
-
-export const metadata: Metadata = { title: "Orizon Pass — Primeiro acesso" };
-
-type SearchParams = Promise<{ etapa?: string }>;
+import { redirect } from "next/navigation";
 
 /**
- * Primeiro acesso do Visitante: quem não tem cadastro entra só como Visitante.
- * E-mail → código de 6 dígitos → criar senha → cadastro (nome, celular, nascimento, Termos).
- * Os demais perfis são cadastrados na web pela Orizon (manual ou Atleta via planilha).
+ * Primeiro acesso PAUSADO na web (Gilmar, 27/11/2026): pelo protótipo aprovado, na web os perfis
+ * já vêm cadastrados e o primeiro acesso do Visitante será só no celular.
+ * O fluxo continua em PrimeiroAcessoFlow.tsx para ser reaproveitado depois.
  */
-export default async function PrimeiroAcessoPage({ searchParams }: { searchParams: SearchParams }) {
-  const { etapa } = await searchParams;
-  return (
-    <div className="page">
-      <main className="card">
-        <Brand />
-        {supabaseConfigured ? <PrimeiroAcessoFlow etapaInicial={etapa === "cadastro" ? "cadastro" : "email"} /> : <ConfigPending />}
-      </main>
-    </div>
-  );
+export default function PrimeiroAcessoPage() {
+  redirect("/entrar");
 }
