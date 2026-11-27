@@ -9,8 +9,6 @@ export default async function InicioPage() {
   const painel = await carregarPainel();
   if (!painel) redirect("/entrar");
 
-  // Visitante que criou a conta mas não terminou o cadastro volta para a última etapa.
-  if (!painel.nome && painel.perfis.every((p) => p === "visitante")) redirect("/primeiro-acesso?etapa=cadastro");
 
   const primeiro = painel.modulos[0]?.itens[0];
   if (primeiro) redirect(`/m/${primeiro.codigo}`);
