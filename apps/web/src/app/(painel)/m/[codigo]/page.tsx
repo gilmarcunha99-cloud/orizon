@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { carregarPainel } from "@/lib/painel";
+import { createClient } from "@/lib/supabase/server";
 import { carregarMatriz, carregarPerfis, carregarSubtipos, carregarUsuarios } from "../../plataforma/dados";
 import { PerfisTela } from "../../plataforma/PerfisTela";
 import { PermissoesTela } from "../../plataforma/PermissoesTela";
@@ -52,8 +53,14 @@ async function Tela({ codigo, num, nome }: { codigo: string; num: string; nome: 
     return <SubtiposTela subtipos={subtipos} perfis={perfis} />;
   }
   if (codigo === "cadastros.usuarios") {
-    const [usuarios, perfis] = await Promise.all([carregarUsuarios(), carregarPerfis()]);
-    return <UsuariosTela usuarios={usuarios} perfis={perfis} />;
+    const supabase = await createClient();
+    const [usuarios, perfis, criar, editar] = await Promise.all([
+      carregarUsuarios(),
+      carregarPerfis(),
+      supabase.rpc("pode", { f: codigo, a: "criar" }),
+      supabase.rpc("pode", { f: codigo, a: "editar" }),
+    ]);
+    return <UsuariosTela usuarios={usuarios} perfis={perfis} podeCriar={Boolean(criar.data)} podeEditar={Boolean(editar.data)} />;
   }
   if (codigo === "plataforma.permissoes") {
     const [{ funcs, permissoes }, perfis] = await Promise.all([carregarMatriz(), carregarPerfis()]);

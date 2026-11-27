@@ -109,3 +109,60 @@ export async function carregarUsuarios(): Promise<UsuarioLinha[]> {
     return { ...r, perfil: p?.perfil ?? null, subtipo: p?.subtipo_id ? (nomeSub.get(p.subtipo_id) ?? null) : null };
   });
 }
+
+export type Inscricao = { evento: string; data: string; origem: string };
+export type UsuarioCompleto = {
+  dados: import("./usuarioRegras").DadosUsuario;
+  inscricoes: Inscricao[];
+};
+
+/** Ficha completa de uma pessoa para a tela de edição (2.1). Retorna null se não existir. */
+export async function carregarUsuario(id: string): Promise<UsuarioCompleto | null> {
+  const supabase = await createClient();
+  const [u, up, fa, pe] = await Promise.all([
+    supabase.from("usuario").select("id, nome, email, cpf, celular, data_nascimento, genero, ativo").eq("id", id).is("excluido_em", null).maybeSingle(),
+    supabase.from("usuario_perfil").select("perfil, subtipo_id").eq("usuario_id", id).maybeSingle(),
+    supabase.from("ficha_atleta").select("*").eq("usuario_id", id).maybeSingle(),
+    supabase.from("papel_evento").select("origem, evento(nome, data_inicio)").eq("usuario_id", id).eq("perfil", "atleta"),
+  ]);
+  checar(u.error);
+  checar(up.error);
+  checar(fa.error);
+  if (!u.data) return null;
+  const f = fa.data;
+  const t = (v: string | null | undefined) => v ?? "";
+  return {
+    dados: {
+      id: u.data.id,
+      nome: u.data.nome,
+      email: u.data.email,
+      cpf: t(u.data.cpf),
+      celular: t(u.data.celular),
+      data_nascimento: t(u.data.data_nascimento),
+      genero: t(u.data.genero),
+      ativo: u.data.ativo,
+      perfil: t(up.data?.perfil),
+      subtipo_id: t(up.data?.subtipo_id),
+      ficha: f
+        ? {
+            cidade: t(f.cidade),
+            uf: t(f.uf),
+            camiseta: t(f.camiseta),
+            grupo: t(f.grupo),
+            emergencia_nome: t(f.emergencia_nome),
+            emergencia_celular: t(f.emergencia_celular),
+            tipo_sanguineo: t(f.tipo_sanguineo),
+            saude_obs: t(f.saude_obs),
+            responsavel_nome: t(f.responsavel_nome),
+            responsavel_cpf: t(f.responsavel_cpf),
+            responsavel_celular: t(f.responsavel_celular),
+          }
+        : null,
+    },
+    // Sem permissão de ver eventos, a lista de inscrições fica vazia em vez de travar a tela.
+    inscricoes: (pe.data ?? []).map((r) => {
+      const ev = (Array.isArray(r.evento) ? r.evento[0] : r.evento) as { nome: string; data_inicio: string } | null;
+      return { evento: ev?.nome ?? "—", data: ev?.data_inicio ?? "", origem: r.origem };
+    }),
+  };
+}

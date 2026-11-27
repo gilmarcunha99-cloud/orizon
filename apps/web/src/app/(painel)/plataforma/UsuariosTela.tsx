@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Perfil, UsuarioLinha } from "./dados";
 import { PillSituacao } from "./Gaveta";
@@ -13,7 +14,17 @@ function formatarCelular(c: string | null) {
   return c || "—";
 }
 
-export function UsuariosTela({ usuarios, perfis }: { usuarios: UsuarioLinha[]; perfis: Pick<Perfil, "codigo" | "nome">[] }) {
+export function UsuariosTela({
+  usuarios,
+  perfis,
+  podeCriar,
+  podeEditar,
+}: {
+  usuarios: UsuarioLinha[];
+  perfis: Pick<Perfil, "codigo" | "nome">[];
+  podeCriar: boolean;
+  podeEditar: boolean;
+}) {
   const [perfil, setPerfil] = useState("");
   const [busca, setBusca] = useState("");
   const [situacao, setSituacao] = useState<"todos" | "ativos" | "inativos">("todos");
@@ -75,6 +86,11 @@ export function UsuariosTela({ usuarios, perfis }: { usuarios: UsuarioLinha[]; p
         <span className="pl-muted">
           {lista.length} de {usuarios.length} usuários
         </span>
+        {podeCriar && (
+          <Link className="pl-b pl-b-p pl-b-link" href="/m/cadastros.usuarios/novo">
+            + Novo usuário
+          </Link>
+        )}
       </div>
       <div className="pl-tcard">
         <table className="pl-table">
@@ -100,6 +116,9 @@ export function UsuariosTela({ usuarios, perfis }: { usuarios: UsuarioLinha[]; p
               <th>Perfil</th>
               <th>Sub-tipo</th>
               <th>Situação</th>
+              <th>
+                <span className="sr-only">Ações</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -113,11 +132,18 @@ export function UsuariosTela({ usuarios, perfis }: { usuarios: UsuarioLinha[]; p
                 <td>
                   <PillSituacao ativo={u.ativo} />
                 </td>
+                <td>
+                  {podeEditar && (
+                    <Link className="pl-lnk" href={`/m/cadastros.usuarios/${u.id}`}>
+                      Editar<span className="sr-only"> {u.nome}</span>
+                    </Link>
+                  )}
+                </td>
               </tr>
             ))}
             {lista.length === 0 && (
               <tr>
-                <td colSpan={6} className="pl-vazio">
+                <td colSpan={7} className="pl-vazio">
                   {usuarios.length ? "Nenhum usuário encontrado com esses filtros." : "Nenhum usuário cadastrado ainda."}
                 </td>
               </tr>
@@ -126,8 +152,8 @@ export function UsuariosTela({ usuarios, perfis }: { usuarios: UsuarioLinha[]; p
         </table>
       </div>
       <p className="pl-note">
-        Clique em <b>Nome</b> para alternar entre A a Z e Z a A. O cadastro e a edição de usuários entram depois da aprovação
-        da prévia da ficha.
+        Clique em <b>Nome</b> para alternar entre A a Z e Z a A. Ao cadastrar, a pessoa recebe um convite por e-mail para
+        criar a própria senha.
       </p>
     </>
   );
