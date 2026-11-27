@@ -21,7 +21,7 @@ function erroBanco(msg: string | undefined): Resultado {
   if (m.includes("usuario_cpf_key")) return falha("Já existe uma pessoa cadastrada com esse CPF.");
   if (m.includes("row-level security") || m.includes("permission denied") || m.startsWith("Sem permissão"))
     return falha("Você não tem permissão para salvar usuários.");
-  if (/^(Escolha|Somente|Você não|O sub-tipo|Usuário não|Esse celular|O perfil Atleta)/.test(m)) return falha(m);
+  if (/^(Escolha|Somente|Você não|O sub-tipo|Usuário não|Esse celular|O perfil Atleta|O perfil Visitante)/.test(m)) return falha(m);
   return falha("Não foi possível salvar. Tente de novo em instantes.");
 }
 
@@ -34,6 +34,7 @@ function validar(d: DadosUsuario): string | null {
   if (!d.genero) return "Escolha o sexo.";
   if (!d.perfil) return "Escolha o perfil.";
   if (d.perfil === "atleta" && !d.id) return "O perfil Atleta só entra pelo cadastro no celular ou pela planilha em 3.3 Inscrições.";
+  if (d.perfil === "visitante" && !d.id) return "O perfil Visitante só entra pelo cadastro no celular.";
   if (d.ficha) {
     const f = d.ficha;
     if (!f.cidade.trim() || !f.uf) return "Na ficha do atleta, informe cidade e UF.";
