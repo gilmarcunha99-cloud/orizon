@@ -43,10 +43,12 @@ export const carregarPainel = cache(async (): Promise<Painel | null> => {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: usuario }, { data: funcs }] = await Promise.all([
+  const [{ data: usuario, error: erroUsuario }, { data: funcs, error: erroFuncs }] = await Promise.all([
     supabase.from("usuario").select("nome, usuario_perfil(perfil)").eq("id", user.id).maybeSingle(),
     supabase.from("funcionalidade").select("codigo, modulo, nome, ordem").order("ordem"),
   ]);
+  // Erro do banco não pode virar "usuário sem perfil": mostra a falha em vez de um menu errado.
+  if (erroUsuario || erroFuncs) throw new Error(`Falha ao carregar o painel: ${(erroUsuario ?? erroFuncs)?.message}`);
   const perfis = ((usuario?.usuario_perfil ?? []) as { perfil: string }[]).map((p) => p.perfil);
 
   let liberadas: Set<string>;
