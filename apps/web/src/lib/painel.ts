@@ -22,8 +22,8 @@ export const MODULOS = [
   { nome: "Financeiro", descricao: "Orçamento, contas e prestação" },
 ] as const;
 
-export type Item = { codigo: string; nome: string };
-export type Modulo = { nome: string; descricao: string; itens: Item[] };
+export type Item = { codigo: string; nome: string; num: string };
+export type Modulo = { nome: string; descricao: string; num: string; itens: Item[] };
 export type Painel = {
   userId: string;
   email: string;
@@ -63,9 +63,14 @@ export const carregarPainel = cache(async (): Promise<Painel | null> => {
     liberadas = new Set();
   }
 
-  const modulos: Modulo[] = MODULOS.map((m) => ({
+  // Numeração do protótipo aprovado: módulo 01, 02… e funcionalidade 1.01, 1.02…
+  const modulos: Modulo[] = MODULOS.map((m, mi) => ({
     ...m,
-    itens: (funcs ?? []).filter((f) => f.modulo === m.nome && liberadas.has(f.codigo)).map(({ codigo, nome }) => ({ codigo, nome })),
+    num: String(mi + 1).padStart(2, "0"),
+    itens: (funcs ?? [])
+      .filter((f) => f.modulo === m.nome)
+      .map((f, fi) => ({ codigo: f.codigo, nome: f.nome, num: `${mi + 1}.${String(fi + 1).padStart(2, "0")}` }))
+      .filter((f) => liberadas.has(f.codigo)),
   })).filter((m) => m.itens.length);
 
   return { userId: user.id, email: user.email ?? "", nome: usuario?.nome ?? "", perfis, modulos };

@@ -92,10 +92,6 @@ export function LoginForm() {
         {enviando ? "Entrando..." : "Entrar"}
         <ArrowIcon />
       </button>
-
-      <Link href="/primeiro-acesso" className="link-strong center-link">
-        Primeiro acesso? Cadastre-se como Visitante
-      </Link>
     </form>
   );
 }
