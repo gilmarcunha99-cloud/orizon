@@ -78,3 +78,34 @@ export async function carregarMatriz(): Promise<{ funcs: Func[]; permissoes: Rec
   for (const r of pe.data ?? []) (permissoes[r.perfil] ??= []).push(`${r.funcionalidade}:${r.acao}`);
   return { funcs, permissoes };
 }
+
+export type UsuarioLinha = {
+  id: string;
+  nome: string;
+  email: string;
+  cpf: string | null;
+  celular: string | null;
+  ativo: boolean;
+  perfil: string | null;
+  subtipo: string | null;
+};
+
+/** Lista 2.1: cada pessoa com o seu perfil atual (o vínculo mais recente) e o sub-tipo. */
+export async function carregarUsuarios(): Promise<UsuarioLinha[]> {
+  const supabase = await createClient();
+  const [u, up, st] = await Promise.all([
+    supabase.from("usuario").select("id, nome, email, cpf, celular, ativo").is("excluido_em", null),
+    supabase.from("usuario_perfil").select("usuario_id, perfil, subtipo_id, criado_em").order("criado_em", { ascending: false }),
+    supabase.from("subtipo").select("id, nome"),
+  ]);
+  checar(u.error);
+  checar(up.error);
+  checar(st.error);
+  const atual = new Map<string, { perfil: string; subtipo_id: string | null }>();
+  for (const r of up.data ?? []) if (!atual.has(r.usuario_id)) atual.set(r.usuario_id, r);
+  const nomeSub = new Map((st.data ?? []).map((s) => [s.id, s.nome]));
+  return (u.data ?? []).map((r) => {
+    const p = atual.get(r.id);
+    return { ...r, perfil: p?.perfil ?? null, subtipo: p?.subtipo_id ? (nomeSub.get(p.subtipo_id) ?? null) : null };
+  });
+}

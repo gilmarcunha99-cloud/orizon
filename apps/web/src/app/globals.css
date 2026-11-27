@@ -296,3 +296,10 @@ a:focus-visible, button:focus-visible, input[type=checkbox]:focus-visible {
 .pl-num { margin-right: 8px; font: 500 12px ui-monospace, 'JetBrains Mono', monospace; color: var(--oz-muted); }
 .pl-chk { width: 20px; height: 20px; margin: 0; accent-color: var(--oz-blue); cursor: pointer; vertical-align: middle; }
 .pl-chk-mudou { outline: 3px solid #F6C48A; outline-offset: 1px; border-radius: 4px; }
+
+/* 2.1 Usuários: ordenação pelo Nome */
+.pl-ord { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.pl-ord-ic { display: inline-flex; flex-direction: column; padding: 2px 5px; border: 1px solid var(--oz-line); border-radius: 5px; background: #FFFFFF; font-size: 9px; line-height: 8px; color: #C4CACA; }
+.pl-ord-ic .on { color: var(--oz-blue); }
+.pl-ord-txt { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--oz-orange-text); }
+.pl-ord:focus-visible { outline: 2px solid var(--oz-orange); outline-offset: 2px; border-radius: 4px; }

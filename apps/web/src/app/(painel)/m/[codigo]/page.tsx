@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { carregarPainel } from "@/lib/painel";
-import { carregarMatriz, carregarPerfis, carregarSubtipos } from "../../plataforma/dados";
+import { carregarMatriz, carregarPerfis, carregarSubtipos, carregarUsuarios } from "../../plataforma/dados";
 import { PerfisTela } from "../../plataforma/PerfisTela";
 import { PermissoesTela } from "../../plataforma/PermissoesTela";
 import { SubtiposTela } from "../../plataforma/SubtiposTela";
+import { UsuariosTela } from "../../plataforma/UsuariosTela";
 
 type Params = Promise<{ codigo: string }>;
 
@@ -49,6 +50,10 @@ async function Tela({ codigo, num, nome }: { codigo: string; num: string; nome: 
   if (codigo === "cadastros.subtipos") {
     const [subtipos, perfis] = await Promise.all([carregarSubtipos(), carregarPerfis()]);
     return <SubtiposTela subtipos={subtipos} perfis={perfis} />;
+  }
+  if (codigo === "cadastros.usuarios") {
+    const [usuarios, perfis] = await Promise.all([carregarUsuarios(), carregarPerfis()]);
+    return <UsuariosTela usuarios={usuarios} perfis={perfis} />;
   }
   if (codigo === "plataforma.permissoes") {
     const [{ funcs, permissoes }, perfis] = await Promise.all([carregarMatriz(), carregarPerfis()]);
