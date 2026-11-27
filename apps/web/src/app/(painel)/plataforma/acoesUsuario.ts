@@ -45,7 +45,7 @@ function validar(d: DadosUsuario): string | null {
 }
 
 /** Cria (com convite por e-mail para a pessoa criar a senha) ou edita um usuário. */
-export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?: string }> {
+export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?: string; convite?: "enviado" | "falhou" }> {
   const erro = validar(d);
   if (erro) return falha(erro);
   const supabase = await createClient();
@@ -84,6 +84,7 @@ export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?:
 
   let id = d.id;
   let criado = false;
+  let conviteFalhou = false;
   if (!id) {
     const { data: pode } = await supabase.rpc("pode", { f: "cadastros.usuarios", a: "criar" });
     if (!pode) return falha("Você não tem permissão para cadastrar usuários.");
@@ -95,13 +96,24 @@ export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?:
       data: { nome: dados.nome },
       redirectTo: `${origem}/entrar`,
     });
-    if (eConv || !conv.user) {
+    if (conv?.user) {
+      id = conv.user.id;
+    } else {
       const m = (eConv?.message ?? "").toLowerCase();
+      if (eConv?.status === 401 || m.includes("api key") || m.includes("jwt"))
+        return falha("A chave secreta do Supabase configurada na Vercel foi recusada. Avise o suporte técnico para corrigi-la.");
       if (m.includes("already") || m.includes("registered")) return falha("Já existe uma conta com esse e-mail.");
-      if (m.includes("rate limit")) return falha("Limite de e-mails atingido. Aguarde alguns minutos e tente de novo.");
-      return falha("Não foi possível enviar o convite agora. Tente de novo em instantes.");
+      // O e-mail não saiu (limite de envios ou falha no servidor de e-mail): cria a conta mesmo assim
+      // e o convite é reenviado depois pela ficha do usuário.
+      const { data: nova, error: eNova } = await admin.auth.admin.createUser({
+        email,
+        email_confirm: false,
+        user_metadata: { nome: dados.nome },
+      });
+      if (eNova || !nova.user) return falha("Não foi possível criar a conta agora. Tente de novo em instantes.");
+      id = nova.user.id;
+      conviteFalhou = true;
     }
-    id = conv.user.id;
     criado = true;
   }
 
@@ -114,6 +126,34 @@ export async function salvarUsuario(d: DadosUsuario): Promise<Resultado & { id?:
   return {
     ok: true,
     id,
+    convite: criado ? (conviteFalhou ? "falhou" : "enviado") : undefined,
     mensagem: criado ? `${dados.nome} cadastrado(a). O convite para criar a senha foi enviado para ${email}.` : "Alterações salvas.",
   };
 }
+
+/** Reenvia o convite para quem ainda não criou a senha. */
+export async function reenviarConvite(id: string): Promise<Resultado> {
+  const supabase = await createClient();
+  const { data: pode } = await supabase.rpc("pode", { f: "cadastros.usuarios", a: "editar" });
+  if (!pode) return falha("Você não tem permissão para reenviar convites.");
+  const admin = createAdminClient();
+  if (!admin) return falha("O envio de convites ainda não está configurado neste ambiente. Avise o suporte técnico.");
+  const { data: u, error: eU } = await admin.auth.admin.getUserById(id);
+  if (eU || !u.user?.email) {
+    if (eU?.status === 401) return falha("A chave secreta do Supabase configurada na Vercel foi recusada. Avise o suporte técnico para corrigi-la.");
+    return falha("Usuário não encontrado.");
+  }
+  if (u.user.last_sign_in_at) return falha("Essa pessoa já criou a senha e acessou o sistema. Se esqueceu a senha, ela usa \"Esqueci minha senha\".");
+  const h = await headers();
+  const origem = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
+  const { error } = await admin.auth.admin.inviteUserByEmail(u.user.email, { redirectTo: `${origem}/entrar` });
+  if (error) {
+    const m = error.message.toLowerCase();
+    if (m.includes("rate limit") || error.status === 429)
+      return falha("Limite de e-mails do ambiente de teste atingido. Tente de novo daqui a uma hora.");
+    return falha("Não foi possível enviar o convite agora. Tente de novo em instantes.");
+  }
+  await supabase.rpc("registrar_log", { p_acao: "usuario.reenviar_convite", p_entidade: "usuario", p_entidade_id: id, p_dados: null });
+  return { ok: true, mensagem: `Convite reenviado para ${u.user.email}.` };
+}
+

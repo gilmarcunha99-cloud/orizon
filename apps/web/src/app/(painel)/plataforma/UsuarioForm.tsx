@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatarCelular } from "@/lib/validation";
-import { salvarUsuario } from "./acoesUsuario";
+import { reenviarConvite, salvarUsuario } from "./acoesUsuario";
+import type { Acesso } from "./acesso";
 import type { Inscricao, Perfil, Subtipo } from "./dados";
 import { Aviso } from "./Gaveta";
 import {
@@ -41,6 +42,7 @@ export function UsuarioForm({
   inscricoes,
   souEu,
   souAdmin,
+  acesso,
 }: {
   inicial: DadosUsuario;
   perfis: Pick<Perfil, "codigo" | "nome" | "ativo">[];
@@ -48,6 +50,7 @@ export function UsuarioForm({
   inscricoes: Inscricao[];
   souEu: boolean;
   souAdmin: boolean;
+  acesso?: { acesso: Acesso; quando: string | null };
 }) {
   const router = useRouter();
   const novo = !inicial.id;
@@ -77,6 +80,17 @@ export function UsuarioForm({
   );
   const travaPerfil = (inicial.perfil === "admin" && !souAdmin) || (souEu && inicial.perfil === "admin");
 
+  function reenviar() {
+    if (!inicial.id) return;
+    setMsg(null);
+    iniciar(async () => {
+      const r = await reenviarConvite(inicial.id!);
+      setMsg(r.ok ? { ok: true, texto: r.mensagem ?? "Convite reenviado." } : { ok: false, texto: r.erro });
+      if (r.ok) router.refresh();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
   function salvar(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
@@ -88,7 +102,7 @@ export function UsuarioForm({
         return;
       }
       if (novo && r.id) {
-        router.replace(`/m/cadastros.usuarios/${r.id}?salvo=1`);
+        router.replace(`/m/cadastros.usuarios/${r.id}?salvo=${r.convite === "falhou" ? "sem-convite" : "1"}`);
       } else {
         setMsg({ ok: true, texto: r.mensagem ?? "Salvo." });
         router.refresh();
@@ -367,6 +381,30 @@ export function UsuarioForm({
           </div>
           <span className="pl-hint">
             As inscrições são criadas em 3.3 Inscrições (pela planilha) ou pelo próprio atleta no celular. Aqui é só consulta.
+          </span>
+        </section>
+      )}
+
+      {!novo && acesso && acesso.acesso !== "desconhecido" && (
+        <section className="pl-sec">
+          <h3>Acesso ao app</h3>
+          <div className="pl-bar">
+            <span className={`pl-pill ${acesso.acesso === "acessou" ? "pl-on" : "pl-ev"}`}>
+              {acesso.acesso === "acessou"
+                ? `Já acessou${acesso.quando ? ` (último acesso em ${new Date(acesso.quando).toLocaleDateString("pt-BR")})` : ""}`
+                : acesso.acesso === "convite_enviado"
+                  ? `Convite enviado${acesso.quando ? ` em ${new Date(acesso.quando).toLocaleDateString("pt-BR")}` : ""}, senha ainda não criada`
+                  : "Convite ainda não enviado"}
+            </span>
+            <span className="pl-grow" />
+            {acesso.acesso !== "acessou" && (
+              <button type="button" className="pl-b" disabled={pendente} onClick={reenviar}>
+                {acesso.acesso === "sem_convite" ? "Enviar convite" : "Reenviar convite"}
+              </button>
+            )}
+          </div>
+          <span className="pl-hint">
+            O convite é um e-mail com o link para a pessoa criar a própria senha. Ninguém da Orizon vê ou define a senha.
           </span>
         </section>
       )}

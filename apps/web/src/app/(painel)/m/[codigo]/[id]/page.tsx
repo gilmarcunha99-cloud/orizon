@@ -5,6 +5,7 @@ import { carregarPainel } from "@/lib/painel";
 import { createClient } from "@/lib/supabase/server";
 import { carregarPerfis, carregarSubtipos, carregarUsuario } from "../../../plataforma/dados";
 import { UsuarioForm } from "../../../plataforma/UsuarioForm";
+import { situacaoAcesso } from "../../../plataforma/acesso";
 import type { DadosUsuario } from "../../../plataforma/usuarioRegras";
 
 type Params = Promise<{ codigo: string; id: string }>;
@@ -35,6 +36,8 @@ export default async function UsuarioPage({ params, searchParams }: { params: Pa
       carregarSubtipos(),
       id === "novo" ? Promise.resolve(null) : carregarUsuario(id),
     ]);
+  const pode0 = id === "novo" ? podeCriar : podeEditar;
+  const acesso = id !== "novo" && pode0 ? await situacaoAcesso(id) : undefined;
   if (id !== "novo" && !usuario) notFound();
   const pode = id === "novo" ? podeCriar : podeEditar;
 
@@ -65,7 +68,13 @@ export default async function UsuarioPage({ params, searchParams }: { params: Pa
           <span className="num-badge">{item.num}</span>
           <h1>{titulo}</h1>
         </div>
-        {salvo && <p className="pl-ok">Usuário cadastrado. O convite para criar a senha foi enviado por e-mail.</p>}
+        {salvo === "1" && <p className="pl-ok">Usuário cadastrado. O convite para criar a senha foi enviado por e-mail.</p>}
+        {salvo === "sem-convite" && (
+          <p className="pl-erro">
+            Usuário cadastrado, mas o e-mail de convite não saiu agora (limite de envios do ambiente de teste). Use{" "}
+            <b>Enviar convite</b> no fim da ficha mais tarde.
+          </p>
+        )}
         {pode ? (
           <UsuarioForm
             key={id}
@@ -75,6 +84,7 @@ export default async function UsuarioPage({ params, searchParams }: { params: Pa
             subtipos={subtipos}
             souEu={auth.user?.id === id}
             souAdmin={Boolean(souAdmin)}
+            acesso={acesso}
           />
         ) : (
           <p className="pl-erro">Você não tem permissão para {id === "novo" ? "cadastrar" : "editar"} usuários.</p>
