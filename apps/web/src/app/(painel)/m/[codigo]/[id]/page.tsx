@@ -7,18 +7,20 @@ import { carregarPerfis, carregarSubtipos, carregarUsuario } from "../../../plat
 import { UsuarioForm } from "../../../plataforma/UsuarioForm";
 import { situacaoAcesso } from "../../../plataforma/acesso";
 import type { DadosUsuario } from "../../../plataforma/usuarioRegras";
+import { ClientePagina } from "../../../cadastros/ClientePagina";
 
 type Params = Promise<{ codigo: string; id: string }>;
 type Busca = Promise<{ salvo?: string }>;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const metadata: Metadata = { title: "Orizon Pass — Usuário" };
+export const metadata: Metadata = { title: "Orizon Pass — Cadastro" };
 
 /** 2.1 Usuários: cadastro (id = "novo") e edição de uma pessoa. */
 export default async function UsuarioPage({ params, searchParams }: { params: Params; searchParams: Busca }) {
   const { codigo, id } = await params;
   const { salvo } = await searchParams;
+  if (codigo === "cadastros.clientes" && (id === "novo" || UUID.test(id))) return <ClientePagina id={id} salvo={salvo} />;
   if (codigo !== "cadastros.usuarios" || (id !== "novo" && !UUID.test(id))) notFound();
 
   const painel = await carregarPainel();
