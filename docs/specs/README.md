@@ -16,6 +16,7 @@ o spec dela e os documentos afetados (`docs/homologacao.md`, `README.md`).
 | [05-cadastros-clientes.md](05-cadastros-clientes.md) | 2.2 Clientes | No ar |
 | [06-cadastros-fornecedores.md](06-cadastros-fornecedores.md) | 2.3 Fornecedores | No ar |
 | [07-cadastros-catalogo.md](07-cadastros-catalogo.md) | 2.6 Serviços, 2.7 Mercadorias, 2.8 Equipamentos e Itens oferecidos | No ar |
+| [08-cadastros-patrocinadores.md](08-cadastros-patrocinadores.md) | 2.4 Patrocinadores | No ar |
 
 ## Modelo para um spec novo
 

@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 
-export type Papel = "cliente" | "fornecedor";
+export type Papel = "cliente" | "fornecedor" | "patrocinador";
 export type BuscaEmpresa =
   | { situacao: "novo" }
   | { situacao: "mesmo"; id: string; nome: string }
