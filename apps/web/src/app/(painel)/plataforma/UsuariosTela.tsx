@@ -83,9 +83,6 @@ export function UsuariosTela({
           <option value="inativos">Só inativos</option>
         </select>
         <span className="pl-grow" />
-        <span className="pl-muted">
-          {lista.length} de {usuarios.length} usuários
-        </span>
         {podeCriar && (
           <Link className="pl-b pl-b-p pl-b-link" href="/m/cadastros.usuarios/novo">
             + Novo usuário

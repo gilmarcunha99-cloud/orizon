@@ -100,9 +100,6 @@ export function FornecedoresTela({
           <option value="inativos">Só inativos</option>
         </select>
         <span className="pl-grow" />
-        <span className="pl-muted">
-          {lista.length} de {fornecedores.length} fornecedores
-        </span>
         {podeCriar && (
           <Link className="pl-b pl-b-p pl-b-link" href="/m/cadastros.fornecedores/novo">
             + Novo fornecedor

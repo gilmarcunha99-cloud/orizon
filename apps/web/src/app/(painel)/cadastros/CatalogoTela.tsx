@@ -99,9 +99,6 @@ export function CatalogoTela({
           <option value="inativos">Só inativos</option>
         </select>
         <span className="pl-grow" />
-        <span className="pl-muted">
-          {lista.length} de {itens.length} {t.plural}
-        </span>
         {podeCriar && (
           <button type="button" className="pl-b pl-b-p" onClick={() => setEditando("novo")}>
             + {t.novo}
