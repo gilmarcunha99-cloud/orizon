@@ -52,7 +52,6 @@ export function PerfisTela({ perfis }: { perfis: Perfil[] }) {
           onChange={(e) => setBusca(e.target.value)}
         />
         <span className="pl-grow" />
-        <span className="pl-muted">{perfis.length} perfis</span>
         <button type="button" className="pl-b pl-b-p" onClick={() => setEditando("novo")}>
           + Novo perfil
         </button>

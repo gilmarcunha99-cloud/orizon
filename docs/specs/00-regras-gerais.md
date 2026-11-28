@@ -22,6 +22,7 @@ Valem para todas as funcionalidades.
 - Os rótulos das telas não usam caixa alta forçada; a regra de CAIXA ALTA é dos dados gravados.
 - Toda funcionalidade nova tem uma prévia aprovada pelo Gilmar antes de ser feita.
 - Erros aparecem em vermelho, em português simples, junto do campo ou do botão.
+- Barra de opções das listas de cadastro (28/11): busca e filtros à esquerda, botão **+ Novo** sempre à direita e sem a contagem de registros. Vale para todos os cadastros (modelo: 2.1 Usuários).
 
 ## Permissões e registro
 - Cada tela confere a permissão do perfil (Ver, Criar, Editar, Aprovar) definida em 1.5 Permissões; o banco confere de novo (RLS).

@@ -350,3 +350,5 @@ a:focus-visible, button:focus-visible, input[type=checkbox]:focus-visible {
 .pl-item-nome { flex: 1; font-weight: 600; }
 .pl-item:focus-within { outline: 2px solid var(--oz-orange); outline-offset: 1px; }
 @media (max-width: 900px) { .pl-itens, .pl-grid2 { grid-template-columns: 1fr; } }
+/* Barra das listas (28/11): o botão + Novo fica sempre à direita, mesmo quando a barra quebra de linha */
+.pl-bar > .pl-b-p:last-child { margin-left: auto; }

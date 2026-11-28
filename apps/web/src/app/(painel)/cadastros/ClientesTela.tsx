@@ -67,9 +67,6 @@ export function ClientesTela({ clientes, podeCriar, podeEditar }: { clientes: Cl
           <option value="inativos">Só inativos</option>
         </select>
         <span className="pl-grow" />
-        <span className="pl-muted">
-          {lista.length} de {clientes.length} clientes
-        </span>
         {podeCriar && (
           <Link className="pl-b pl-b-p pl-b-link" href="/m/cadastros.clientes/novo">
             + Novo cliente
