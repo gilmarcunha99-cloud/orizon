@@ -12,6 +12,8 @@ import { carregarClientes } from "../../cadastros/dadosClientes";
 import { FornecedoresTela } from "../../cadastros/FornecedoresTela";
 import { carregarFornecedores } from "../../cadastros/dadosFornecedores";
 import { CatalogoTela } from "../../cadastros/CatalogoTela";
+import { PatrocinadoresTela } from "../../cadastros/PatrocinadoresTela";
+import { carregarPatrocinadores } from "../../cadastros/dadosPatrocinadores";
 import { tipoDoCodigo } from "../../cadastros/catalogoRegras";
 import { carregarCatalogo } from "../../cadastros/dadosCatalogo";
 
@@ -86,6 +88,15 @@ async function Tela({ codigo, num, nome }: { codigo: string; num: string; nome: 
       supabase.rpc("pode", { f: codigo, a: "editar" }),
     ]);
     return <FornecedoresTela fornecedores={fornecedores} podeCriar={Boolean(criar.data)} podeEditar={Boolean(editar.data)} />;
+  }
+  if (codigo === "cadastros.patrocinadores") {
+    const supabase = await createClient();
+    const [patrocinadores, criar, editar] = await Promise.all([
+      carregarPatrocinadores(),
+      supabase.rpc("pode", { f: codigo, a: "criar" }),
+      supabase.rpc("pode", { f: codigo, a: "editar" }),
+    ]);
+    return <PatrocinadoresTela patrocinadores={patrocinadores} podeCriar={Boolean(criar.data)} podeEditar={Boolean(editar.data)} />;
   }
   const tipoItem = tipoDoCodigo(codigo);
   if (tipoItem) {

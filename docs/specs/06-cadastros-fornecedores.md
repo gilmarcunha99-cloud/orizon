@@ -37,4 +37,4 @@ Cartão de crédito, Cartão de débito, Cheque, Permuta. O meio usado em cada c
 - Código: `apps/web/src/app/(painel)/cadastros/` (partes comuns em `CamposEmpresa.tsx`).
 
 ## Próximo
-- 2.4 Patrocinadores pode reaproveitar `salvar_empresa` (incluir o papel no mapeamento e na regra de leitura).
+- 2.4 Patrocinadores já usa `salvar_empresa` (veja [08-cadastros-patrocinadores.md](08-cadastros-patrocinadores.md)).

@@ -352,3 +352,9 @@ a:focus-visible, button:focus-visible, input[type=checkbox]:focus-visible {
 @media (max-width: 900px) { .pl-itens, .pl-grid2 { grid-template-columns: 1fr; } }
 /* Barra das listas (28/11): o botão + Novo fica sempre à direita, mesmo quando a barra quebra de linha */
 .pl-bar > .pl-b-p:last-child { margin-left: auto; }
+
+/* 2.4 Patrocinadores: convite ao Orizon Pass e listas ainda vazias */
+.pl-convite { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #DDE1E1; border-radius: 10px; background: #FFFFFF; }
+.pl-convite .pl-b:disabled { opacity: .55; cursor: not-allowed; }
+.pl-vazio-caixa { margin: 0; padding: 14px 16px; border: 1px dashed #C9CFCF; border-radius: 10px; color: var(--oz-muted); font-size: 14px; }
+@media (max-width: 700px) { .pl-convite { flex-wrap: wrap; } }

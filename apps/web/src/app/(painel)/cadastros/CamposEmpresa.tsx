@@ -6,7 +6,7 @@ import { UFS, formatarCpf } from "../plataforma/usuarioRegras";
 import { buscarEmpresa, type Papel } from "./acoesEmpresa";
 import { formatarCep, formatarCnpj } from "./clienteRegras";
 
-/** Partes comuns das fichas de empresa (2.2 Clientes e 2.3 Fornecedores). */
+/** Partes comuns das fichas de empresa (2.2 Clientes, 2.3 Fornecedores e 2.4 Patrocinadores). */
 
 export const maiusc = (s: string) => s.toLocaleUpperCase("pt-BR");
 export const minusc = (s: string) => s.toLowerCase().trim();
@@ -35,6 +35,7 @@ type Identidade = {
 };
 
 const PAPEL_NOME: Record<string, string> = { cliente: "Cliente", fornecedor: "Fornecedor", patrocinador: "Patrocinador" };
+const PAPEL_TELA: Record<Papel, string> = { cliente: "clientes", fornecedor: "fornecedores", patrocinador: "patrocinadores" };
 
 /**
  * Identificação (tipo de pessoa, CNPJ/CPF, situação, razão social, IE, nome fantasia).
@@ -68,7 +69,7 @@ export function SecaoIdentificacao<T extends Identidade>({
       setAviso(
         <p className="pl-erro">
           Esse {pj ? "CNPJ" : "CPF"} já está cadastrado como {PAPEL_NOME[papel]}: <b>{r.nome}</b>.{" "}
-          <Link href={`/m/cadastros.${papel === "cliente" ? "clientes" : "fornecedores"}/${r.id}`}>Abrir o cadastro</Link>
+          <Link href={`/m/cadastros.${PAPEL_TELA[papel]}/${r.id}`}>Abrir o cadastro</Link>
         </p>,
       );
     } else if (r.situacao === "outro") {
